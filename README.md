@@ -102,17 +102,20 @@ optional arguments:
                         log packet filtered to file
 ```
 
-### Monitoring (without dropping packets) and trace to file (example) :
+## Examples
+
+### Monitoring and trace to file :
 ```bash
 ./appfirewall.py --explore -t journalise.log
 ```
 
-### Run in 'Whitelist Mode' (accept all in whitelist, finally drop) and log (example) :
+### Run in 'Whitelist Mode' and log  :
 ```bash
 ./appfirewall.py --whitelist --log
 ```
 
-### Run in 'Blacklist Mode' (drop all in blacklist, finally accept) and daemonize (example) :
+
+### Run in 'Blacklist Mode' and daemonize :
 ```bash
 ./appfirewall.py --blacklist --daemon
 ```
