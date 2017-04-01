@@ -14,6 +14,26 @@ On Debian/Ubuntu :
 apt-get install libnetfilter-queue1, nfqueue-bindings-python python-dpkt python-ipaddress python-enum34 python-psutil
 ```
 
+Install configuration file `/etc/appfirewall.conf` :
+
+`make install_configuration`
+
+
+Edit this file at your convenience. Example :
+```bash
+[GLOBAL]
+
+# NetFilter Queue Number
+# default = 0
+queue-num = 0
+
+# White list
+whitelist = /usr/sbin/sshd, /usr/lib/apt/methods/http, /usr/sbin/avahi-daemon, /sbin/dhclient, /usr/sbin/ntpd
+
+# Black list
+blacklist = /usr/bin/wget, /bin/nc.openbsd
+```
+
 
 ## Module nfnetlink_queue
 
@@ -63,7 +83,48 @@ auditctl -D
 auditctl -a exit,always -F arch=b64 -S connect -S sendto -S sendmsg
 ```
 
+## Help
+./appfirewall.py --help
+usage: appfirewall.py [-h] [-v] [-d] [--debug] [-w | -b | -e] [-l]
+                      [-t FILENAME]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --version         show version
+  -d, --daemon          Run as daemon
+  --debug               Debug
+  -w, --whitelist       accept all in whitelist, finally drop
+  -b, --blacklist       drop all in blacklist, finally accept
+  -e, --explore         Explore mode (accept all packets)
+  -l, --log             log packet filtered to syslog
+  -t FILENAME, --trace FILENAME
+                        log packet filtered to file
+
+
+## Monitoring (without dropping packets) and trace to file (example) :
+```bash
+./appfirewall.py --explore -t journalise.log
+```
+
+## Run in 'Whitelist Mode' (accept all in whitelist, finally drop) and log (example) :
+```bash
+./appfirewall.py --whitelist --log
+```
+
+## Run in 'Blacklist Mode' (drop all in blacklist, finally accept) and daemonize (example) :
+```bash
+./appfirewall.py --blacklist --daemon
+```
+
 # Debugging
+
+## Debugging Appfirewall in "Whitelist Mode" (example) :
+
+In this example, only _avahi-daemon_, _dnsmasq_ and _ping_ are allowed. The payload is `nc 192.168.58.1 631`.
+```bash
+./appfirewall.py --whitelist --debug
+'/bin/nc.openbsd' (or 'nc 192.168.58.1') is not in whitelist -> DROP. ('tcp', '192.168.1.12', 43400, '192.168.58.1', 631)
+```
 
 ## To monitor the status of _libnetfilter_queue_ :
 ```bash
