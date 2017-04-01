@@ -30,7 +30,7 @@ lsmod | grep queue
 nfnetlink_queue        20480  1
 ```
 
-## Audit daemon
+## Audit daemon
 
 Appfirewall is better with Auditd, but it can run without it.
 
