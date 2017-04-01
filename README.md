@@ -83,7 +83,8 @@ auditctl -D
 auditctl -a exit,always -F arch=b64 -S connect -S sendto -S sendmsg
 ```
 
-## Help
+### Help
+```bash
 ./appfirewall.py --help
 usage: appfirewall.py [-h] [-v] [-d] [--debug] [-w | -b | -e] [-l]
                       [-t FILENAME]
@@ -99,26 +100,26 @@ optional arguments:
   -l, --log             log packet filtered to syslog
   -t FILENAME, --trace FILENAME
                         log packet filtered to file
+```
 
-
-## Monitoring (without dropping packets) and trace to file (example) :
+### Monitoring (without dropping packets) and trace to file (example) :
 ```bash
 ./appfirewall.py --explore -t journalise.log
 ```
 
-## Run in 'Whitelist Mode' (accept all in whitelist, finally drop) and log (example) :
+### Run in 'Whitelist Mode' (accept all in whitelist, finally drop) and log (example) :
 ```bash
 ./appfirewall.py --whitelist --log
 ```
 
-## Run in 'Blacklist Mode' (drop all in blacklist, finally accept) and daemonize (example) :
+### Run in 'Blacklist Mode' (drop all in blacklist, finally accept) and daemonize (example) :
 ```bash
 ./appfirewall.py --blacklist --daemon
 ```
 
 # Debugging
 
-## Debugging Appfirewall in "Whitelist Mode" (example) :
+### Debugging Appfirewall in "Whitelist Mode" (example) :
 
 In this example, only _avahi-daemon_, _dnsmasq_ and _ping_ are allowed. The payload is `nc 192.168.58.1 631`.
 ```bash
@@ -126,7 +127,7 @@ In this example, only _avahi-daemon_, _dnsmasq_ and _ping_ are allowed. The payl
 '/bin/nc.openbsd' (or 'nc 192.168.58.1') is not in whitelist -> DROP. ('tcp', '192.168.1.12', 43400, '192.168.58.1', 631)
 ```
 
-## To monitor the status of _libnetfilter_queue_ :
+### To monitor the status of _libnetfilter_queue_ :
 ```bash
 watch -n 5 cat /proc/net/netfilter/nfnetlink_queue
 1  31621     0 2  4016     0     0        2  1
@@ -142,7 +143,7 @@ watch -n 5 cat /proc/net/netfilter/nfnetlink_queue
 * Total number of packets sent to queue
 * 1
 
-## Test _libnetfilter_queue_ :
+### Test _libnetfilter_queue_ :
 
 In userspace, _queueasyncthread.py_ use libnetfilter_queue (queue 0)
 
@@ -157,7 +158,7 @@ Quit with CTRL+C
  1 | 192.168.1.12 > 192.168.58.1
 ```
 
-## Auditd - Monitor log messages :
+### Auditd - Monitor log messages :
 ```bash
 ./appfw/auditprocess.py
 Quit with CTRL+C
@@ -165,7 +166,7 @@ type=SYSCALL msg=audit(1491057722.786:102): arch=c000003e syscall=42 success=yes
 type=SOCKADDR msg=audit(1491057722.786:102): saddr=020000357F0001010000000000000000
 ```
 
-## Auditd - Parse log messages :
+### Auditd - Parse log messages :
 
 ```bash
 ./appfw/parseaudit.py 
