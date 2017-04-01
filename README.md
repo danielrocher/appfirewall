@@ -96,9 +96,7 @@ Quit with CTRL+C
  1 | 192.168.1.12 > 192.168.58.1
 ```
 
-## Test auditd :
-
-### Auditd - Monitor log messages :
+## Auditd - Monitor log messages :
 ```bash
 ./appfw/auditprocess.py
 Quit with CTRL+C
@@ -106,7 +104,7 @@ type=SYSCALL msg=audit(1491057722.786:102): arch=c000003e syscall=42 success=yes
 type=SOCKADDR msg=audit(1491057722.786:102): saddr=020000357F0001010000000000000000
 ```
 
-### Auditd - Parse log messages :
+## Auditd - Parse log messages :
 
 ```bash
 ./appfw/parseaudit.py 
