@@ -108,5 +108,13 @@ type=SOCKADDR msg=audit(1491057722.786:102): saddr=020000357F0001010000000000000
 
 ### Auditd - Parse log messages :
 
-
+```bash
+./appfw/parseaudit.py 
+Quit with CTRL+C
+Starting Auditd ...
+Auditd started
+auditd | exe=/usr/bin/curl, command=curl resydev.fr, ppid=2817, pid=4490, uid=0, family=02, address=127.0.1.1, port=53
+auditd | exe=/usr/bin/curl, command=curl resydev.fr, ppid=2817, pid=4490, uid=0, family=02, address=212.227.247.84, port=80
+auditd | exe=/usr/bin/curl, command=curl resydev.fr, ppid=2817, pid=4490, uid=0, family=0A, address=2001:8d8:1001:124c:8ae5:8584:36eb:f01b, port=80
+```
 
