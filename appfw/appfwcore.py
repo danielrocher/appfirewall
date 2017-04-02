@@ -211,11 +211,6 @@ class AppfwCore(Thread):
                 res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
             
             if res:
-                try:
-                    self.methodCount[source_inf]+=1
-                except:
-                    self.methodCount[source_inf]=1
-
                 program, command, pid, ppid = res
                 command=" ".join(command.split()[0:2]) # reduce command
                 self.printDebug("Program : {}, Command: {}, pid : {}, ppid : {}, protocol : {} , [{}]:{}->[{}]:{}  (from '{}')".format(program, command, pid, ppid, protocol_name, ipsource, sport, ipdestination, dport, source_inf))
@@ -230,7 +225,13 @@ class AppfwCore(Thread):
                     action=nfqueue.NF_DROP # si dans liste noire, jette le paquet
             # PID not found :-( -> accept payload
             if pid==None:
+                source_inf="notfound"
                 self.alert("PID not found %s" % str(lst_payload))
+
+            try:
+                self.methodCount[source_inf]+=1
+            except:
+                self.methodCount[source_inf]=1
 
             # update cache
             self.lock.acquire()

@@ -11,7 +11,7 @@ Appfirewall requires : netfilter-queue, python2.7, nfqueue-bindings-python, pyth
 On Debian/Ubuntu :
 
 ```bash
-apt-get install libnetfilter-queue1, nfqueue-bindings-python python-dpkt python-ipaddress python-enum34 python-psutil
+apt-get install libnetfilter-queue1 nfqueue-bindings-python python-dpkt python-enum34 python-psutil python-ipaddress
 ```
 
 Install configuration file `/etc/appfirewall.conf` :
@@ -77,10 +77,12 @@ ip6tables -I OUTPUT ! -o lo -j NFQUEUE --queue-bypass
  * `--queue-num <number>` : Queue number
  * `--queue-bypass` : The packet are authorized if no software is listening to the queue
 
-If you use Auditd, delete all and add a rule :
+If you use Auditd, delete all and add this new rules :
 ```bash
 auditctl -D
-auditctl -a exit,always -F arch=b64 -S connect -S sendto -S sendmsg
+auditctl -a exit,always -F arch=b64 -S connect
+auditctl -a exit,always -F arch=b64 -F success!=0 -S sendto
+auditctl -a exit,always -F arch=b64 -F success!=0 -F a3!=1 -S sendmsg
 ```
 
 ### Help
