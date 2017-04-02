@@ -88,7 +88,7 @@ auditctl -a exit,always -F arch=b64 -F success!=0 -F a3!=1 -S sendmsg
 ### Help
 ```bash
 ./appfirewall.py --help
-usage: appfirewall.py [-h] [-v] [-d] [--debug] [-w | -b | -e] [-l]
+usage: appfirewall.py [-h] [-v] [-d] [--debug] [-w | -b | -m] [-l]
                       [-t FILENAME]
 
 optional arguments:
@@ -98,7 +98,7 @@ optional arguments:
   --debug               Debug
   -w, --whitelist       accept all in whitelist, finally drop
   -b, --blacklist       drop all in blacklist, finally accept
-  -e, --explore         Explore mode (accept all packets)
+  -m, --monitor         Monitor mode (accept all packets)
   -l, --log             log packet filtered to syslog
   -t FILENAME, --trace FILENAME
                         log packet filtered to file
@@ -108,7 +108,7 @@ optional arguments:
 
 ### Monitoring and trace to file :
 ```bash
-./appfirewall.py --explore -t journalise.log
+./appfirewall.py --monitor -t journalise.log
 ```
 
 ### Run in 'Whitelist Mode' and log  :

@@ -29,7 +29,7 @@ class Main():
         self.blacklist=[]
         self.icmp_max_size=0 # no limit
         self.udp_max_size=0  # no limit
-        self.mode=Mode.explore
+        self.mode=Mode.monitor
         self.log=False
         self.trace=False
         self.trace_filename=None
@@ -41,13 +41,13 @@ class Main():
         self.parseArgs()
         # Read config file
         self.readConfigFile(self.fileconfname)
-        if self.mode != Mode.explore:
+        if self.mode != Mode.monitor:
             if self.mode==Mode.whitelist:
                 self.printDebug("WhiteList : %s" % self.whitelist)
             else:
                 self.printDebug("BlackList : %s" % self.blacklist)
         else:
-            self.printDebug("Explore mode set")
+            self.printDebug("Monitor mode set")
 
         if self.icmp_max_size!=0:
             self.printDebug("limit the size of ICMP packets enabled: %s" % self.icmp_max_size)
@@ -113,7 +113,7 @@ class Main():
         group = parser.add_mutually_exclusive_group()
         group.add_argument("-w", "--whitelist", help="accept all in whitelist, finally drop", action="store_true")
         group.add_argument("-b", "--blacklist", help="drop all in blacklist, finally accept", action="store_true")
-        group.add_argument("-e", "--explore", help="Explore mode (accept all packets)", action="store_true")
+        group.add_argument("-m", "--monitor", help="Monitor mode (accept all packets)", action="store_true")
         parser.add_argument("-l", "--log", help="log packet filtered to syslog", action="store_true")
         parser.add_argument("-t", "--trace", metavar="FILENAME", help="log packet filtered to file")
         args=parser.parse_args()
@@ -133,7 +133,7 @@ class Main():
         elif args.whitelist==True:
             self.mode=Mode.whitelist
         else: # default mode
-            self.mode=Mode.explore
+            self.mode=Mode.monitor
 
         if args.log==True:
             self.log=True

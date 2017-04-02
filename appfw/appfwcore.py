@@ -19,7 +19,7 @@ from appfw.parseaudit import ParseAudit
 
 
 class Mode(Enum):
-    explore = 1
+    monitor = 1
     whitelist = 2
     blacklist = 3
 
@@ -29,14 +29,14 @@ class IPversion(Enum):
 
 
 class AppfwCore(Thread):
-    def __init__(self, queue_number=0, mode=Mode.explore, whitelist=[], blacklist=[], icmp_max_size=0,
+    def __init__(self, queue_number=0, mode=Mode.monitor, whitelist=[], blacklist=[], icmp_max_size=0,
             udp_max_size=0, callback_alert=None, debug=False):
         Thread.__init__(self)
         self.debug=debug
         self.callback_alert=callback_alert
         self.queue_number=queue_number
         self.mode=mode
-        self.explorelist=[]
+        self.monitorlist=[]
         self.srcSockTable=[]
         self.dstSockTable=[]
         self.decisionDic={}
@@ -123,7 +123,7 @@ class AppfwCore(Thread):
                 if len(self.icmp_max_size_cache)>self.limitsizeoftable:
                     del self.icmp_max_size_cache[0] # remove oldest
             self.lock_icmp_max_size_cache.release()
-            if self.mode!=Mode.explore:
+            if self.mode!=Mode.monitor:
                 action=nfqueue.NF_DROP
                 self._setverdict(payload, action)
                 return 1
@@ -138,7 +138,7 @@ class AppfwCore(Thread):
                 if len(self.udp_max_size_cache)>self.limitsizeoftable:
                     del self.udp_max_size_cache[0] # remove oldest
             self.lock_udp_max_size_cache.release()
-            if self.mode!=Mode.explore:
+            if self.mode!=Mode.monitor:
                 action=nfqueue.NF_DROP
                 self._setverdict(payload, action)
                 return 1
@@ -214,8 +214,8 @@ class AppfwCore(Thread):
                 program, command, pid, ppid = res
                 command=" ".join(command.split()[0:2]) # reduce command
                 self.printDebug("Program : {}, Command: {}, pid : {}, ppid : {}, protocol : {} , [{}]:{}->[{}]:{}  (from '{}')".format(program, command, pid, ppid, protocol_name, ipsource, sport, ipdestination, dport, source_inf))
-                if self.mode==Mode.explore and program not in self.explorelist:
-                    self.explorelist.append(program)
+                if self.mode==Mode.monitor and program not in self.monitorlist:
+                    self.monitorlist.append(program)
                     self.alert("%s (pid: %s, ppid: %s) added to list. %s" % (program, pid, ppid ,str(lst_payload)))
                 elif self.mode==Mode.whitelist and program not in self.whitelist and command not in self.whitelist:
                     self.alert("'%s' (or '%s') is not in whitelist -> DROP. %s" % (program, command, str(lst_payload)))
@@ -277,8 +277,8 @@ class AppfwCore(Thread):
         self.printDebug("%d packets handled" % self.count)
         self.printDebug("%d packets dropped" % self.drop)
         self.printDebug("Method used : %s" % str(self.methodCount))
-        if self.mode==Mode.explore:
-            self.alert("List of programs that have attempted to connect (explore mode only) : %s" % str(self.explorelist))
+        if self.mode==Mode.monitor:
+            self.alert("List of programs that have attempted to connect (monitor mode only) : %s" % str(self.monitorlist))
         self.th_queue_async=None
         self.threadauditd=None
 
