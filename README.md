@@ -124,7 +124,7 @@ optional arguments:
 
 ### Debugging Appfirewall in "Whitelist Mode" (example) :
 
-In this example, only _avahi-daemon_, _dnsmasq_ and _ping_ are allowed. The payload is `nc 192.168.58.1 631`.
+In this example, only _avahi-daemon_, _dnsmasq_ and _ping_ are allowed. The payload is generated with `nc 192.168.58.1 631`.
 ```bash
 ./appfirewall.py --whitelist --debug
 '/bin/nc.openbsd' (or 'nc 192.168.58.1') is not in whitelist -> DROP. ('tcp', '192.168.1.12', 43400, '192.168.58.1', 631)

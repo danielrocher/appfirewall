@@ -21,11 +21,15 @@ class AuditProcess(Thread):
     def run(self):
         if self.process :
             return
-        self.process = subprocess.Popen(["auditd", "-f" ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for line in iter(self.process.stdout.readline, ''):
-            self.stdout(line.replace('\n', ''))
-            if self.process==None :
-                return
+        try:
+            self.process = subprocess.Popen(["auditd", "-f" ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in iter(self.process.stdout.readline, ''):
+                self.stdout(line.replace('\n', ''))
+                if self.process==None :
+                    return
+        except OSError:
+            print "Failed to use auditd."
+            self.process=None
 
     def stop(self):
         if self.process==None :
