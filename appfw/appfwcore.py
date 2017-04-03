@@ -196,20 +196,18 @@ class AppfwCore(Thread):
 
             if not res:
                 source_inf="auditd"
-                time.sleep(0.01) # FIXME Waiting because the packet come before auditd see it ...
-                res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
+                # Waiting because the packet come before auditd see it ...
+                for i in range(20):
+                    res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
+                    time.sleep(0.0001*i)
+                    if res:
+                        break
 
             # This is a dead PID, search if a program listen source port 
             if not res and (protocol==ip.IP_PROTO_UDP or protocol==ip.IP_PROTO_TCP):
                 source_inf="fuser"
                 res = self.system.getProcessNameAndPidFromListenSourcePort(protocol_name, sport)
 
-            if not res:
-                # test auditd again
-                source_inf="auditd"
-                time.sleep(0.08) # FIXME
-                res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
-            
             if res:
                 program, command, pid, ppid = res
                 command=" ".join(command.split()[0:2]) # reduce command
