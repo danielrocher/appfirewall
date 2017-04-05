@@ -217,10 +217,10 @@ class AppfwCore(Thread):
                     self.alert("%s (pid: %s, ppid: %s) added to list. %s" % (program, pid, ppid ,str(lst_payload)))
                 elif self.mode==Mode.whitelist and program not in self.whitelist and command not in self.whitelist:
                     self.alert("'%s' (or '%s') is not in whitelist -> DROP. %s" % (program, command, str(lst_payload)))
-                    action=nfqueue.NF_DROP # si pas dans liste blanche, jette le paquet
+                    action=nfqueue.NF_DROP
                 elif self.mode==Mode.blacklist and (program in self.blacklist or command in self.blacklist):
                     self.alert("%s (or '%s') is in blacklist -> DROP. %s" % (program, command, str(lst_payload)))
-                    action=nfqueue.NF_DROP # si dans liste noire, jette le paquet
+                    action=nfqueue.NF_DROP
             # PID not found :-( -> accept payload
             if pid==None:
                 source_inf="notfound"
