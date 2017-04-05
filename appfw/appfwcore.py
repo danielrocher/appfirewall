@@ -161,8 +161,13 @@ class AppfwCore(Thread):
         # ICMP
         if protocol == ip.IP_PROTO_ICMP:
             protocol_name="icmp"
-        
-        lst_payload= (protocol_name, ipsource, sport, ipdestination, dport )
+
+        if ipversion==IPversion.v4:
+           ip_version_number=0x02
+        else:
+           ip_version_number=0x0A
+
+        lst_payload= (ip_version_number, protocol_name, ipsource, sport, ipdestination, dport )
         #self.printDebug(" sport : %s" % sport)
         #self.printDebug(" dport : %s" % dport)
 
@@ -189,24 +194,22 @@ class AppfwCore(Thread):
             
             source_inf=None
             res=None
-            
-            if protocol==ip.IP_PROTO_UDP or protocol==ip.IP_PROTO_TCP:
-                source_inf="fuser"
+
+            source_inf="auditd"
+            # Waiting because the packet come before auditd see it ...
+            for i in range(20):
+                res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
+                time.sleep(0.0001)
+                if res:
+                    break
+
+            if not res and (protocol==ip.IP_PROTO_UDP or protocol==ip.IP_PROTO_TCP):
+                source_inf="procfs"
                 res = self.system.getProcessNameAndPidFromPayload(lst_payload)
 
-            if not res:
-                source_inf="auditd"
-                # Waiting because the packet come before auditd see it ...
-                for i in range(20):
-                    res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
-                    time.sleep(0.0001*i)
-                    if res:
-                        break
-
-            # This is a dead PID, search if a program listen source port 
-            if not res and (protocol==ip.IP_PROTO_UDP or protocol==ip.IP_PROTO_TCP):
-                source_inf="fuser"
-                res = self.system.getProcessNameAndPidFromListenSourcePort(protocol_name, sport)
+                # This is a dead PID, search if a program listen source port 
+                if not res:
+                    res = self.system.getProcessNameAndPidFromListenSourcePort(ip_version_number, protocol_name, sport)
 
             if res:
                 program, command, pid, ppid = res
