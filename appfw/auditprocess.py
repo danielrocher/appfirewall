@@ -14,6 +14,7 @@ class AuditProcess(Thread):
         Thread.__init__(self)
         self.process=None
         self.callback=callback
+        self.running=True
 
     def stdout(self, msg):
         self.callback(msg)
@@ -26,16 +27,23 @@ class AuditProcess(Thread):
             for line in iter(self.process.stdout.readline, ''):
                 self.stdout(line.replace('\n', ''))
                 if self.process==None :
+                    self.running=False
                     return
+
         except OSError:
             print "Failed to use auditd."
             self.process=None
+            self.running=False
+
+    def isRunning(self):
+        return self.running
 
     def stop(self):
         if self.process==None :
             return
         self.process.kill()
         self.process=None
+        self.running=False
 
 
 if __name__ == '__main__':

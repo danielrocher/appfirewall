@@ -189,6 +189,9 @@ class ParseAudit(Thread):
 
             return program_name, command, pid, ppid
 
+    def isRunning(self):
+        return self.auditprocessthread.isRunning()
+
     def run(self):
         self.debug("Starting Auditd ...", 0)
         if self.auditprocessthread :

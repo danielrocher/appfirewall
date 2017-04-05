@@ -195,13 +195,14 @@ class AppfwCore(Thread):
             source_inf=None
             res=None
 
-            source_inf="auditd"
-            # Waiting because the packet come before auditd see it ...
-            for i in range(20):
-                res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
-                time.sleep(0.0001)
-                if res:
-                    break
+            if self.threadauditd.isRunning():
+                source_inf="auditd"
+                # Waiting because the packet come before auditd see it ...
+                for i in range(20):
+                    res = self.threadauditd.getProcessNameAndPidFromDestination(ipdestination, dport)
+                    time.sleep(0.0001)
+                    if res:
+                        break
 
             if not res and (protocol==ip.IP_PROTO_UDP or protocol==ip.IP_PROTO_TCP):
                 source_inf="procfs"
