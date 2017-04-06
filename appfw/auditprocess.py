@@ -14,7 +14,7 @@ class AuditProcess(Thread):
         Thread.__init__(self)
         self.process=None
         self.callback=callback
-        self.running=True
+        self.running=False
 
     def stdout(self, msg):
         self.callback(msg)
@@ -24,6 +24,7 @@ class AuditProcess(Thread):
             return
         try:
             self.process = subprocess.Popen(["auditd", "-f" ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            self.running=True
             for line in iter(self.process.stdout.readline, ''):
                 self.stdout(line.replace('\n', ''))
                 if self.process==None :
