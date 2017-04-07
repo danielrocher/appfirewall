@@ -117,11 +117,6 @@ class ParseAudit(Thread):
                     print "error : Impossible to unpack port : %s !" % saddr
 
                 if address and port and (address, port) not in self.dstSockTable:
-                    if "/bin/fuser" in self.SyscallRecord.exe: # fuser is used by appfirewall, ignore it
-                        self.SyscallRecord=None
-                        self.lastSyscallMatch=False
-                        return
-
                     self.SyscallRecord.family=family
                     self.SyscallRecord.port=port
                     self.SyscallRecord.address=address
