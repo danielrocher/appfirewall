@@ -7,7 +7,7 @@
 
 from threading import Thread, Lock
 import auditprocess
-import re, ipaddress
+import re, binascii, ipaddress
 
 class SyscallConnectRecord():
     def __init__(self):
@@ -80,6 +80,12 @@ class ParseAudit(Thread):
             self.SyscallRecord.uid=matchObj.group(4)
             self.SyscallRecord.command=matchObj.group(5).replace('"', '')
             self.SyscallRecord.exe=matchObj.group(6).replace('"', '')
+            # auditd sometimes encodes in hex (non-ascii)
+            if self.SyscallRecord.exe:
+                try:
+                    self.SyscallRecord.exe=binascii.unhexlify(self.SyscallRecord.exe)
+                except:
+                    pass
 
     def parseSockAddrMsg(self, msg):
         """Parse auditd SOCKADDR message"""

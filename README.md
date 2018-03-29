@@ -18,6 +18,8 @@ Install configuration file `/etc/appfirewall.conf` :
 
 `make install_configuration`
 
+Install appfirewall  :
+`make install`
 
 Edit this file at your convenience. Example :
 ```bash
