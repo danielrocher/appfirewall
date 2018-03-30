@@ -78,10 +78,17 @@ if __name__ == '__main__':
         thread.join()
         thread=None
 
-    def callback(i, payload):
+    def callback(i, p=None):
         protocol=None
         ipsource=None
         ipdestination=None
+        if type(i)==nfqueue.payload:
+            payload=i
+        elif type(p)==nfqueue.payload:
+            payload=p
+        else:
+            print "Impossible to parse nfqueue callback !"
+            return
         data = payload.get_data()
         try: # try IPv4
             pkt = ip.IP(data)

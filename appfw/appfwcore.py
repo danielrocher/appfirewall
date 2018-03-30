@@ -74,7 +74,7 @@ class AppfwCore(Thread):
             self.drop+=1
 
 
-    def callback(self, i, payload):
+    def callback(self, i, p=None):
         """receive a packet from NF_QUEUE"""
         self.count+=1
         # default action
@@ -82,6 +82,13 @@ class AppfwCore(Thread):
         program=None
         pid=None
         ppid=None
+        if type(i)==nfqueue.payload:
+            payload=i
+        elif type(p)==nfqueue.payload:
+            payload=p
+        else:
+            print "Impossible to parse nfqueue callback !"
+            return
         size_payload=payload.get_length()
 
         # self.printDebug ("payload len : %s" % size_payload)
