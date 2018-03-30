@@ -181,8 +181,7 @@ class Main():
             self.icmp_max_size=config.getint("GLOBAL", "icmp_max_size")
             self.udp_max_size=config.getint("GLOBAL", "udp_max_size")
         except:
-            print "Unable to retrieve configuration data in {}:\n{}".format(filename, sys.exc_info()[0])
-            sys.exit(1)
+            print "Unable to retrieve configuration data in {} ({})".format(filename, sys.exc_info()[0])
 
 
 if __name__ == "__main__":
