@@ -7,12 +7,13 @@
 
 from socket import AF_INET, AF_INET6, inet_ntop
 import nfqueue
-import time
+import time, urllib
 
 from enum import Enum
 from dpkt import ip, ip6
 from threading import Thread, Lock
 
+from appfw.remote import Remote
 from appfw.system import System
 from appfw.queueasyncthread import QueueAsyncThread
 from appfw.parseaudit import ParseAudit
@@ -30,9 +31,10 @@ class IPversion(Enum):
 
 class AppfwCore(Thread):
     def __init__(self, queue_number=0, mode=Mode.monitor, whitelist=[], blacklist=[], icmp_max_size=0,
-            udp_max_size=0, callback_alert=None, debug=False):
+            udp_max_size=0, callback_alert=None, debug=False, remote_host=None):
         Thread.__init__(self)
         self.debug=debug
+        self.remote_host=remote_host
         self.callback_alert=callback_alert
         self.queue_number=queue_number
         self.mode=mode
@@ -225,12 +227,15 @@ class AppfwCore(Thread):
                 self.printDebug("Program : {}, Command: {}, pid : {}, ppid : {}, protocol : {} , [{}]:{}->[{}]:{}  (from '{}')".format(program, command, pid, ppid, protocol_name, ipsource, sport, ipdestination, dport, source_inf))
                 if self.mode==Mode.monitor and program not in self.monitorlist:
                     self.monitorlist.append(program)
+                    self.send_to_remote("mon", program, command)
                     self.alert("%s (pid: %s, ppid: %s) added to list. %s" % (program, pid, ppid ,str(lst_payload)))
                 elif self.mode==Mode.whitelist and program not in self.whitelist and command not in self.whitelist:
                     self.alert("'%s' (or '%s') is not in whitelist -> DROP. %s" % (program, command, str(lst_payload)))
+                    self.send_to_remote("deny", program, command)
                     action=nfqueue.NF_DROP
                 elif self.mode==Mode.blacklist and (program in self.blacklist or command in self.blacklist):
                     self.alert("%s (or '%s') is in blacklist -> DROP. %s" % (program, command, str(lst_payload)))
+                    self.send_to_remote("deny", program, command)
                     action=nfqueue.NF_DROP
             # PID not found :-( -> accept payload
             if pid==None:
@@ -264,7 +269,10 @@ class AppfwCore(Thread):
         self._setverdict(payload, action)
         return 1
 
-
+    def send_to_remote(self, typ, program, command):
+        if self.remote_host:
+            remote=Remote("%s?type=%s&r=%s&c=%s" % (self.remote_host, typ, urllib.pathname2url(program), urllib.pathname2url(command)))
+            remote.start()
 
     def run(self):
         if self.th_queue_async:

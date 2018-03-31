@@ -29,6 +29,7 @@ class Main():
         self.blacklist=[]
         self.icmp_max_size=0 # no limit
         self.udp_max_size=0  # no limit
+        self.remote_host=None
         self.mode=Mode.monitor
         self.log=False
         self.trace=False
@@ -69,7 +70,7 @@ class Main():
         signal.signal(signal.SIGINT, self.signal_handler)
         
         self.appfwcore_thread=AppfwCore(self.queue_num, mode=self.mode, whitelist=self.whitelist, blacklist=self.blacklist, icmp_max_size=self.icmp_max_size,
-            udp_max_size=self.udp_max_size, callback_alert=self.callbackAlert, debug=self.debug)
+            udp_max_size=self.udp_max_size, callback_alert=self.callbackAlert, debug=self.debug, remote_host=self.remote_host)
         self.appfwcore_thread.start()
         
         while self.appfwcore_thread:
@@ -180,6 +181,7 @@ class Main():
             self.blacklist=self.getListFromLineParsing(config.get("GLOBAL", "blacklist"))
             self.icmp_max_size=config.getint("GLOBAL", "icmp_max_size")
             self.udp_max_size=config.getint("GLOBAL", "udp_max_size")
+            self.remote_host=config.get("GLOBAL", "remote_host")
         except:
             print "Unable to retrieve configuration data in {} ({})".format(filename, sys.exc_info()[0])
 
