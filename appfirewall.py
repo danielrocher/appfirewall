@@ -160,30 +160,45 @@ class Main():
                 print "Impossible to write to file %s" % self.trace_filename
 
 
-            
-    def getListFromLineParsing(self, string):
-        if not ',' in string:
-            string +=','
-        tmplist=string.strip().split(',')
-        newlist=[]
-        for arg in tmplist:
-            if arg!="":
-                newlist.append(arg.strip())
-        return newlist
-
     def readConfigFile(self, filename):
+        def getConfigValue(mConfig, section, key, default="", typ=str):
+            error=None
+            if mConfig.has_option(section, key):
+                if typ==str:
+                    return mConfig.get(section, key)
+                elif typ==int:
+                    try:
+                        return int(mConfig.get(section, key))
+                    except:
+                        error="%s.%s (int required)" % (section, key)
+                elif typ==bool:
+                    try:
+                        return mConfig.getboolean(section, key)
+                    except:
+                        error="%s.%s (boolean required)" % (section, key)
+                elif typ==list:
+                    string=config.get(section, key)
+                    if not ',' in string:
+                        string +=','
+                    tmplist=string.strip().split(',')
+                    newlist=[]
+                    for arg in tmplist:
+                        if arg:
+                            newlist.append(arg.strip())
+                    return newlist
+            if error:
+                print "Unable to retrieve configuration data in {} : {}".format(filename, error)
+            return default
+            
         config = ConfigParser.ConfigParser()
         config.read(self.fileconfname)
-        try:
-            # section DEFAULT
-            self.queue_num=config.getint("GLOBAL", "queue-num")
-            self.whitelist=self.getListFromLineParsing(config.get("GLOBAL", "whitelist"))
-            self.blacklist=self.getListFromLineParsing(config.get("GLOBAL", "blacklist"))
-            self.icmp_max_size=config.getint("GLOBAL", "icmp_max_size")
-            self.udp_max_size=config.getint("GLOBAL", "udp_max_size")
-            self.remote_host=config.get("GLOBAL", "remote_host")
-        except:
-            print "Unable to retrieve configuration data in {} ({})".format(filename, sys.exc_info()[0])
+        # section DEFAULT
+        self.queue_num=getConfigValue(config,"GLOBAL", "queue-num", self.queue_num, int)
+        self.whitelist=getConfigValue(config,"GLOBAL", "whitelist", self.whitelist, list)
+        self.blacklist=getConfigValue(config,"GLOBAL", "blacklist", self.blacklist, list)
+        self.icmp_max_size=getConfigValue(config,"GLOBAL", "icmp_max_size",self.icmp_max_size, int)
+        self.udp_max_size=getConfigValue(config,"GLOBAL", "udp_max_size",self.udp_max_size, int)
+        self.remote_host=getConfigValue(config,"GLOBAL", "remote_host",self.remote_host, str)
 
 
 if __name__ == "__main__":
