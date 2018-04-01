@@ -31,10 +31,11 @@ class AuditProcess(Thread):
                     self.running=False
                     return
 
-        except OSError:
+        except:
             print "Failed to use auditd."
-            self.process=None
-            self.running=False
+
+        self.process=None
+        self.running=False
 
     def isRunning(self):
         return self.running

@@ -283,14 +283,17 @@ class AppfwCore(Thread):
             return
         self.th_queue_async = QueueAsyncThread(self.callback, self.queue_number, self.debug)
         self.th_queue_async.start()
+        
         self.threadauditd=ParseAudit(debug=self.debug, loglevel=1)
         self.threadauditd.start()
-        
-    def stop(self):
-        self.th_queue_async.stop()
-        self.th_queue_async.join()
+
+        while self.th_queue_async.is_alive():
+            self.th_queue_async.join(1)
+
+        time.sleep(1) # wait, perhaps auditd is trying to start ...
         self.threadauditd.stop()
         self.threadauditd.join()
+
         self.printDebug("%d packets handled" % self.count)
         self.printDebug("%d packets dropped" % self.drop)
         self.printDebug("Method used : %s" % str(self.methodCount))
@@ -299,4 +302,7 @@ class AppfwCore(Thread):
         self.th_queue_async=None
         self.threadauditd=None
 
+    def stop(self):
+        self.th_queue_async.stop()
+        self.threadauditd.stop()
 

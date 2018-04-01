@@ -191,7 +191,9 @@ class ParseAudit(Thread):
             return program_name, command, pid, ppid
 
     def isRunning(self):
-        return self.auditprocessthread.isRunning()
+        if self.auditprocessthread:
+            return self.auditprocessthread.isRunning()
+        return False
 
     def run(self):
         self.debug("Starting Auditd ...", 0)
@@ -200,15 +202,15 @@ class ParseAudit(Thread):
         self.auditprocessthread = auditprocess.AuditProcess(self.callback)
         self.auditprocessthread.start()
         self.debug("Auditd started", 0)
-
-    def stop(self):
-        self.debug("Stopping Auditd ...", 0)
-        if self.auditprocessthread==None :
-            return
-        self.auditprocessthread.stop()
         self.auditprocessthread.join()
         self.auditprocessthread=None
         self.debug("Auditd stopped", 0)
+
+    def stop(self):
+        if self.auditprocessthread==None :
+            return
+        self.debug("Stopping Auditd ...", 0)
+        self.auditprocessthread.stop()
 
 
 if __name__ == '__main__':

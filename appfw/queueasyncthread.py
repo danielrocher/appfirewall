@@ -21,20 +21,6 @@ class QueueAsyncThread(asyncore.file_dispatcher, Thread):
         self.q = nfqueue.queue()
         self.printDebug("Setting callback")
         self.q.set_callback(callback)
-        self.printDebug("Open nfqueue number %s" % self.queue_number)
-        try:
-            self.q.fast_open(self.queue_number, AF_INET6)
-            self.fd = self.q.get_fd()
-            self.q.set_queue_maxlen(100000)
-            asyncore.file_dispatcher.__init__(self, self.fd, None)
-            self.q.set_mode(nfqueue.NFQNL_COPY_PACKET)
-        except:
-            self._stop = True
-            print "Impossible to open NetFilter Queue {}".format(self.queue_number)
-            return
-
-        self.nf_queue_started=True
-        self.printDebug("Queue is ready")
 
     def printDebug(self, msg):
         if self.debug:
@@ -47,6 +33,21 @@ class QueueAsyncThread(asyncore.file_dispatcher, Thread):
         return False
     
     def run(self):
+        self.printDebug("Trying to open nfqueue %s ..." % self.queue_number)
+        try:
+            self.q.fast_open(self.queue_number, AF_INET6)
+            self.fd = self.q.get_fd()
+            self.q.set_queue_maxlen(100000)
+            asyncore.file_dispatcher.__init__(self, self.fd, None)
+            self.q.set_mode(nfqueue.NFQNL_COPY_PACKET)
+        except:
+            self._stop = True
+            print "Impossible to open NetFilter Queue {}".format(self.queue_number)
+            return
+
+        self.nf_queue_started=True
+        self.printDebug("Queue {} is ready".format(self.queue_number))
+
         while not self._stop:
             asyncore.poll(timeout=0.1)
         

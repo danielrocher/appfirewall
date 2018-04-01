@@ -68,13 +68,16 @@ class Main():
 
         # SIGINT for interrupt program
         signal.signal(signal.SIGINT, self.signal_handler)
-        
+        signal.signal(signal.SIGTERM, self.signal_handler)
+        signal.signal(signal.SIGQUIT, self.signal_handler)
+
         self.appfwcore_thread=AppfwCore(self.queue_num, mode=self.mode, whitelist=self.whitelist, blacklist=self.blacklist, icmp_max_size=self.icmp_max_size,
             udp_max_size=self.udp_max_size, callback_alert=self.callbackAlert, debug=self.debug, remote_host=self.remote_host)
         self.appfwcore_thread.start()
-        
-        while self.appfwcore_thread:
-            time.sleep(1)
+
+        while self.appfwcore_thread.is_alive():
+            self.appfwcore_thread.join(1)
+        self.appfwcore_thread=None
 
         if self.filetrace_descriptor:
             try:
@@ -86,9 +89,6 @@ class Main():
     def signal_handler(self, signal, frame):
         self.printDebug("Wait. Stopping all ...")
         self.appfwcore_thread.stop()
-        self.appfwcore_thread.join()
-        self.appfwcore_thread=None
-        
 
     def daemonize(self):
         """daemonize (run as server)"""
