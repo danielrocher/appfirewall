@@ -9,7 +9,6 @@ from socket import AF_INET, AF_INET6, inet_ntop
 import nfqueue
 import time, urllib
 
-from enum import Enum
 from dpkt import ip, ip6
 from threading import Thread, Lock
 
@@ -19,12 +18,12 @@ from appfw.queueasyncthread import QueueAsyncThread
 from appfw.parseaudit import ParseAudit
 
 
-class Mode(Enum):
+class Mode():
     monitor = 1
     whitelist = 2
     blacklist = 3
 
-class IPversion(Enum):
+class IPversion():
     v4 = 1
     v6 = 2
 

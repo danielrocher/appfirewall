@@ -5,13 +5,13 @@ _This program is licensed to you under the terms of the GNU General Public Licen
 
 # Installation
 
-Appfirewall requires : netfilter-queue, python2.7, nfqueue-bindings-python, python-dpkt, python-ipaddress, python-enum, python-psutil
+Appfirewall requires : netfilter-queue, python2.7, nfqueue-bindings-python, python-dpkt, python-ipaddress, python-psutil
  
  
 On Debian/Ubuntu :
 
 ```bash
-apt-get install libnetfilter-queue1 nfqueue-bindings-python python-dpkt python-enum34 python-psutil python-ipaddress
+apt-get install libnetfilter-queue1 nfqueue-bindings-python python-dpkt python-psutil python-ipaddress
 ```
 
 Install configuration file `/etc/appfirewall.conf` :
